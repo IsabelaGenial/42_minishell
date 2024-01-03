@@ -1,54 +1,72 @@
-# **************************************************************************** #
-#                                                                              #
-#                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
-#                                                     +:+ +:+         +:+      #
-#    By: igenial <igenial@student.42sp.org.br>      +#+  +:+       +#+         #
-#                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2023/11/28 16:54:03 by igenial           #+#    #+#              #
-#    Updated: 2023/11/28 17:46:19 by igenial          ###   ########.fr        #
-#                                                                              #
-# **************************************************************************** #
+NAME = minishell
 
-NAME			=	minishell
-MANDATORY		=   minishell.c handler_input.c 
-FILES			=	$(MANDATORY:%.c=%.o)
-BONUS			=
-HEADER			=	minishell.h
-LIB				=	./libfstonk/libft.a
-CC				=	cc
-CFLAGS			=	-g3 -Wall -Wextra -Werror
-VALGRIND		=	valgrind --leak-check=full --show-leak-kinds=all --track-fds=yes
-GDB				=	gdb --tui --args
+CC = cc
+FLAGS = -Wall -Werror -Wextra -g3
 
-all: libft $(NAME)
+SRC_DIR = src
+SRC =	mini_shell.c	\
+		main.c			\
+		signals.c		\
+		hashtable.c		\
+		set_env.c		\
+		init.c			\
+		tokenizer.c		\
+		token_utils.c	\
+		lexer.c			\
+		parser.c		\
+		cmd_list.c		\
+		cmd_list_utils.c\
+		builtin.c		\
+		expand_var.c	\
+		export.c		\
+		exit.c			\
+		echo.c			\
+		cd.c			\
+		heredoc.c		\
+		execute.c
 
-$(NAME): $(FILES)
-	@$(CC) $(CFLAGS) -I. $(FILES) $(LIB) -o $(NAME)
+OBJ_DIR = obj
+OBJ = $(patsubst %,$(OBJ_DIR)/%,$(SRC:.c=.o))
 
-%.o: %.c
-	@$(CC) $(CFLAGS) -c $< -o $@
+LIBFT = libft/libft.a
 
-bonus:
-	@make fclean
-	@make MANDATORY="$(BONUS)"
+LIBS = -lreadline -Llibft -lft
 
-libft:
-	make -C libfstonk
+all: directory $(NAME)
+
+$(NAME): $(LIBFT) $(OBJ)
+	$(CC) $(FLAGS) $^ $(LIBS) -o $(NAME)
+
+directory: $(OBJ_DIR)
+
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(FLAGS) -I./includes/ -g3 -c $< -o $@
+
+$(LIBFT):
+	@make -C libft
 
 clean:
-	@rm -f $(FILES)
+	rm -rf $(OBJ)
+	rm -rf $(OBJ_DIR)
+	@make -C libft clean
 
 fclean: clean
-	@rm -f $(NAME)
-	@make fclean -Clibfstonk
+	rm -rf $(NAME)
+	@make -C libft fclean
 
 re: fclean all
 
 valgrind: all
-	$(VALGRIND) ./$(NAME)
+	valgrind --leak-check=full --track-origins=yes --suppressions=supp.supp \
+	--trace-children-skip='*/bin/*,*/sbin/*' --show-leak-kinds=all -q ./$(NAME)
 
 gdb: all
-	$(GDB) ./$(NAME)
+	gdb --tui ./$(NAME)
 
-.PHONY:	all clean fclean re bonus libft valgrind gdb
+run: all
+	./$(NAME)
+
+.PHONY: all clean fclean re directory valgrind run
