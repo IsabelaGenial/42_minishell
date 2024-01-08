@@ -3,44 +3,37 @@ NAME = minishell
 CC = cc
 FLAGS = -Wall -Werror -Wextra -g3
 
-SRC	=	main.c  init.c
-SRC +=	$(addprefix ./builtin, builtin.c builtin/export.c builtin/exit.c builtin/echo.c builtin/cd.c)
-SRC +=	$(addprefix ./src,	cmd_list/cmd_list.c	cmd_list/cmd_list_utils.c cmd_list/hashtable.c)
-SRC +=	$(addprefix ./src, error/error.c)
-SRC +=	$(addprefix ./src , executor/expand_var.c executor/execute.c)
-SRC +=	$(addprefix ./src, heredoc/heredoc.c)
-SRC	+=	$(addprefix ./src, lexer/set_env.c, lexer/tokenizer.c lexer/token_utils.c lexer/lexer.c)
-SRC	+=	$(addprefix ./parser, parser.c)
-SRC	+=	$(addprefix ./signal, signals.c)
+SRC = src/main.c ./src/init.c
+SRC += src/builtin/builtin.c src/builtin/export.c src/builtin/exit.c src/builtin/echo.c src/builtin/cd.c src/builtin/set_env.c
+SRC += src/cmd_list/cmd_list.c src/cmd_list/cmd_list_utils.c src/cmd_list/hashtable.c
+SRC += src/error/error.c
+SRC	+= src/executor/expand_var.c src/executor/execute.c
+SRC += src/heredoc/heredoc.c
+SRC += src/lexer/tokenizer.c src/lexer/token_utils.c src/lexer/lexer.c
+SRC += src/parser/parser.c
+SRC += src/signal/signals.c
 
 
-OBJ_DIR = obj
-OBJ = $(patsubst %,$(OBJ_DIR)/%,$(SRC:.c=.o))
+OBJ = $(SRC:.c=.o)
 
 LIBFT = libft/libft.a
 
 LIBS = -lreadline -Llibft -lft
 
-all: directory $(NAME)
 
-$(NAME): $(LIBFT) $(OBJ)
-	$(CC) $(FLAGS) $^ $(LIBS) -o $(NAME)
+all: $(NAME)
 
-directory: $(OBJ_DIR)
-
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
-
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(FLAGS) -I./includes/ -g3 -c $< -o $@
+$(NAME): $(OBJ) $(LIBFT)
+	$(CC) $(FLAGS) $(OBJ) $(LIBS)  -o $(NAME)
 
 $(LIBFT):
 	@make -C libft
 
+%.o: %.c
+	$(CC) $(FLAGS) -I./includes/shell.h -g3 -c $< -o $@
+
 clean:
 	rm -rf $(OBJ)
-	rm -rf $(OBJ_DIR)
-	@make -C libft clean
 
 fclean: clean
 	rm -rf $(NAME)

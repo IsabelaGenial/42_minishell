@@ -72,9 +72,9 @@ int	lexer(char **str)
 	}
 	if (g_main.open_quote)
 	{
-        my_error(QUOTE, NULL, 1);
+		ft_putstr_fd("Error: unclosed quotes\n", 2);
         g_main.open_quote = 0;
-		clear_token_list();]
+		clear_token_list();
 
 		return (1);
 	}

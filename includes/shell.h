@@ -234,6 +234,5 @@ char	*heredoc(char *delimiter);
 //------------------TEST FUNCTIONS-----------------------
 //------------------TEST FUNCTIONS-----------------------
 void	print_hashtable(t_env **env_var);
-char	*get_line(void);
 
 #endif //SHELL_H
