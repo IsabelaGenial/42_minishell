@@ -12,6 +12,8 @@
 
 #include "shell.h"
 
+t_main	g_main;
+
 // char	*get_line(int flag)
 // {
 // 	char	*line;
@@ -70,4 +72,32 @@ void	execute_cmd_list(void)
 		}
 		cmd = cmd->next;
 	}
+}
+
+int	main(__attribute__((unused))int argc, __attribute__((unused))char **argv,
+            char **env)
+{
+	char	*line;
+
+	signal_set();
+	init_global();
+	set_env(g_main.env_var, env);
+	while (1)
+	{
+		line = get_line();
+		if (!line)
+			ft_exit2(g_main.status);
+		if (ft_strlen(line) > 0)
+		{
+			g_main.line = line;
+			lexer(&line);
+			parser();
+			execute_cmd_list();
+			clear_token_list();
+			clear_cmd_list();
+			add_history(g_main.line);
+		}
+		ft_safe_free((void **)&line);
+	}
+	return (g_main.status);
 }

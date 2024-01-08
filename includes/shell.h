@@ -28,6 +28,17 @@
 # define FALSE 0
 # define TRUE 1
 
+enum    e_my_error
+{
+        QUOTE,
+        NOT_DIR,
+        NOT_PARM,
+        NOT_CMD,
+        FORK_ERROR,
+        PIPE_ERROR,
+        PIPE_ND_ERROR,
+        IS_DIR,
+};
 typedef enum s_token_type
 {
 	WORD,
@@ -51,8 +62,8 @@ typedef enum s_builtin
 	EXIT
 }	t_builtin;
 
-//Structs
-//token list
+//--Structs--//
+//Token list
 
 typedef struct s_token
 {
@@ -62,7 +73,7 @@ typedef struct s_token
 	struct s_token	*prev;
 }	t_token;
 
-//command list
+//Command list
 
 typedef struct s_cmd
 {
@@ -77,7 +88,7 @@ typedef struct s_cmd
 	struct s_cmd	*prev;
 }	t_cmd;
 
-//cmd_info
+//Cmd_info
 
 typedef struct s_cmd_info
 {
@@ -91,7 +102,7 @@ typedef struct s_cmd_info
 	int		pipe_count;
 }	t_cmd_info;
 
-//hashtable
+//Hashtable
 
 typedef struct s_env
 {
@@ -113,6 +124,7 @@ typedef struct s_main
 	int			status;
 	int			is_heredoc_running;
 }	t_main;
+
 
 //Global variable
 

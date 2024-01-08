@@ -3,27 +3,16 @@ NAME = minishell
 CC = cc
 FLAGS = -Wall -Werror -Wextra -g3
 
-SRC_DIR = src
-SRC =	mini_shell.c	\
-		main.c			\
-		signals.c		\
-		hashtable.c		\
-		set_env.c		\
-		init.c			\
-		tokenizer.c		\
-		token_utils.c	\
-		lexer.c			\
-		parser.c		\
-		cmd_list.c		\
-		cmd_list_utils.c\
-		builtin.c		\
-		expand_var.c	\
-		export.c		\
-		exit.c			\
-		echo.c			\
-		cd.c			\
-		heredoc.c		\
-		execute.c
+SRC	=	main.c  init.c
+SRC +=	$(addprefix ./builtin, builtin.c builtin/export.c builtin/exit.c builtin/echo.c builtin/cd.c)
+SRC +=	$(addprefix ./src,	cmd_list/cmd_list.c	cmd_list/cmd_list_utils.c cmd_list/hashtable.c)
+SRC +=	$(addprefix ./src, error/error.c)
+SRC +=	$(addprefix ./src , executor/expand_var.c executor/execute.c)
+SRC +=	$(addprefix ./src, heredoc/heredoc.c)
+SRC	+=	$(addprefix ./src, lexer/set_env.c, lexer/tokenizer.c lexer/token_utils.c lexer/lexer.c)
+SRC	+=	$(addprefix ./parser, parser.c)
+SRC	+=	$(addprefix ./signal, signals.c)
+
 
 OBJ_DIR = obj
 OBJ = $(patsubst %,$(OBJ_DIR)/%,$(SRC:.c=.o))
