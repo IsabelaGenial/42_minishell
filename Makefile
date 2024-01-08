@@ -24,13 +24,13 @@ LIBS = -lreadline -Llibft -lft
 all: $(NAME)
 
 $(NAME): $(OBJ) $(LIBFT)
-	$(CC) $(FLAGS) $(OBJ) $(LIBS)  -o $(NAME)
+	$(CC) $(FLAGS) $(OBJ) $(LIBS)  -o $(NAME) -I ./includes
 
 $(LIBFT):
 	@make -C libft
 
 %.o: %.c
-	$(CC) $(FLAGS) -I./includes/shell.h -g3 -c $< -o $@
+	$(CC) $(FLAGS) -I./includes/ -g3 -c $< -o $@
 
 clean:
 	rm -rf $(OBJ)

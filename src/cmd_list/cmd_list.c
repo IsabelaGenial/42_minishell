@@ -30,7 +30,7 @@ static int	get_argc(t_token *tmp)
 
 void	create_arg_list(t_cmd *cmd, t_token *tmp)
 {
-	cmd->args = malloc(sizeof(char *) * (get_argc(tmp) + 2));
+	cmd->args = ft_calloc(sizeof(char *), (get_argc(tmp) + 2));
 	if (get_argc(tmp) > 0)
 		cmd->args[cmd->argc++] = ft_strdup(tmp->prev->name);
 	while (tmp && tmp->type != PIPE)
