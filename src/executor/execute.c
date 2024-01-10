@@ -99,7 +99,7 @@
 // {
 // 	int			pipefd[2];
 // 	pid_t		pid;
-
+//
 // 	if (pipe(pipefd) == -1)
 // 	{
 // 		ft_putstr_fd("pipe error\n", 2);

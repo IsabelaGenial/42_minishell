@@ -28,17 +28,6 @@
 # define FALSE 0
 # define TRUE 1
 
-enum    e_my_error
-{
-        QUOTE,
-        NOT_DIR,
-        NOT_PARM,
-        NOT_CMD,
-        FORK_ERROR,
-        PIPE_ERROR,
-        PIPE_ND_ERROR,
-        IS_DIR,
-};
 typedef enum s_token_type
 {
 	WORD,
@@ -118,7 +107,7 @@ typedef struct s_main
 	t_env		*env_var[TABLE_SIZE];
 	t_token		*token_list;
 	t_cmd		*cmd_list;
-	t_cmd_info	cmd_info;
+	t_cmd_info	*cmd_info;
 	char		*line;
 	int			open_quote;
 	int			status;
@@ -191,7 +180,8 @@ int		exec_builtin(char *name, char **args, int argc);
 
 //execute.c
 
-void	execute_cmd_list(void);
+
+
 char	*check_path(char *name);
 void	exec(t_cmd *cmd, char *path);
 int		check_if_builtin(char *name);

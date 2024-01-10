@@ -3,15 +3,16 @@ NAME = minishell
 CC = cc
 FLAGS = -Wall -Werror -Wextra -g3
 
-SRC = src/main.c ./src/init.c
-SRC += src/builtin/builtin.c src/builtin/export.c src/builtin/exit.c src/builtin/echo.c src/builtin/cd.c src/builtin/set_env.c
-SRC += src/cmd_list/cmd_list.c src/cmd_list/cmd_list_utils.c src/cmd_list/hashtable.c
-SRC += src/error/error.c
-SRC	+= src/executor/expand_var.c src/executor/execute.c
-SRC += src/heredoc/heredoc.c
-SRC += src/lexer/tokenizer.c src/lexer/token_utils.c src/lexer/lexer.c
-SRC += src/parser/parser.c
-SRC += src/signal/signals.c
+SRC =	src/main.c ./src/init.c
+SRC +=	src/builtin/builtin.c src/builtin/export.c src/builtin/exit.c src/builtin/echo.c src/builtin/cd.c src/builtin/set_env.c \
+		src/builtin/pipe.c
+SRC +=	src/cmd_list/cmd_list.c src/cmd_list/cmd_list_utils.c src/cmd_list/hashtable.c
+SRC +=	src/error/error.c
+SRC	+=	src/executor/expand_var.c src/executor/execute.c
+SRC +=	src/heredoc/heredoc.c
+SRC +=	src/lexer/tokenizer.c src/lexer/token_utils.c src/lexer/lexer.c
+SRC +=	src/parser/parser.c
+SRC +=	src/signal/signals.c
 
 
 OBJ = $(SRC:.c=.o)
@@ -51,4 +52,4 @@ gdb: all
 run: all
 	./$(NAME)
 
-.PHONY: all clean fclean re directory valgrind run
+.PHONY: all clean fclean re valgrind gdb run
