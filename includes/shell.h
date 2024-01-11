@@ -51,6 +51,7 @@ typedef enum s_builtin
 	EXIT
 }	t_builtin;
 
+
 //--Structs--//
 //Token list
 
@@ -220,6 +221,10 @@ int		free_tab(char **tab);
 //heredoc.c
 
 char	*heredoc(char *delimiter);
+
+//PIPE------------------------------------------
+//pipe.c
+void ft_pipe(t_cmd *cmd);
 
 //------------------TEST FUNCTIONS-----------------------
 //------------------TEST FUNCTIONS-----------------------

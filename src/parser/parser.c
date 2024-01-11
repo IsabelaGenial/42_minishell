@@ -42,9 +42,10 @@ void	arrange_cmd_list(void)
 
 	tmp = g_main.cmd_list;
 	move = TRUE;
+	g_main.cmd_info->pipe_count = 0;
 	while (tmp && tmp->next)
 	{
-		if (tmp->type == WORD && tmp->next && move)
+		if (tmp->type == WORD && tmp->next->type != PIPE && move)
 		{
 			move = FALSE;
 			hold = tmp;
@@ -52,7 +53,11 @@ void	arrange_cmd_list(void)
 		}
 		tmp = tmp->next;
 		if (tmp && tmp->type == PIPE)
+		{
+			g_main.cmd_info->pipe_count++;
+//			ft_pipe(tmp);
 			move = TRUE;
+		}
 	}
 	while (tmp && tmp->prev)
 		tmp = tmp->prev;

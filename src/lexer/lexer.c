@@ -27,10 +27,7 @@ int	get_type(char *str)
 	else if (!ft_strcmp(str, "||"))
 		return (OR);
 	else if (!ft_strcmp(str, "|"))
-	{
-		g_main.cmd_info->pipe_count++;
 		return (PIPE);
-	}
 	return (WORD);
 }
 
