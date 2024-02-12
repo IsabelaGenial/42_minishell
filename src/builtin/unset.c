@@ -1,26 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rseelaen <rseelaen@student.42.fr>          +#+  +:+       +#+        */
+/*   By: renato <renato@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/04/18 12:09:06 by rseelaen          #+#    #+#             */
-/*   Updated: 2024/02/01 13:45:18 by rseelaen         ###   ########.fr       */
+/*   Created: 2024/02/02 01:48:08 by renato            #+#    #+#             */
+/*   Updated: 2024/02/02 01:48:23 by renato           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "shell.h"
 
-//Return the length of a string
-size_t	ft_strlen(const char *s)
+int	ft_unset(char **args)
 {
-	size_t	length;
+	int	i;
+	int	ret;
 
-	if (!s)
-		return (0);
-	length = 0;
-	while (*s++)
-		length++;
-	return (length);
+	i = 0;
+	ret = 0;
+	while (args[i])
+	{
+		delete_key(g_main.env_var, args[i]);
+		i++;
+	}
+	return (ret);
 }

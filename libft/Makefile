@@ -6,6 +6,7 @@ SRC = ft_atoi.c ft_bzero.c ft_calloc.c ft_isalnum.c ft_isalpha.c ft_isascii.c\
 	ft_strjoin.c ft_strlcat.c ft_strlcpy.c ft_strlen.c ft_strmapi.c\
 	ft_strncmp.c ft_strnstr.c ft_strrchr.c ft_strtrim.c ft_substr.c ft_atol.c\
 	ft_tolower.c ft_toupper.c ft_arrlen.c ft_safe_free.c ft_ternary.c\
+	merge_sort.c\
 	ft_iswhitespace.c ft_strcmp.c ft_strndup.c free_tab.c\
 	ft_lstadd_back.c ft_lstadd_front.c ft_lstclear.c\
 	ft_lstdelone.c ft_lstiter.c ft_lstlast.c\
@@ -19,18 +20,26 @@ SRC = ft_atoi.c ft_bzero.c ft_calloc.c ft_isalnum.c ft_isalpha.c ft_isascii.c\
 CC = cc
 FLAGS = -Wall -Werror -Wextra -g3
 NAME = libft.a
-OBJ = $(SRC:.c=.o)
+OBJ_DIR = obj
+OBJ = $(patsubst %,$(OBJ_DIR)/%,$(SRC:.c=.o))
 
-all: $(NAME)
+all: directory $(NAME)
 	
 $(NAME): $(OBJ)
 	@ar -rcs $(NAME) $(OBJ)
 
-%.o: %.c
+directory: $(OBJ_DIR)
+
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+$(OBJ_DIR)/%.o: %.c
+	@mkdir -p $(@D)
 	@$(CC) $(FLAGS) -c $< -o $@
 
 clean:
 	@rm -rf $(OBJ)
+	@rm -rf $(OBJ_DIR)
 	
 fclean: clean
 	@rm -rf libft.a	

@@ -6,7 +6,7 @@
 /*   By: rseelaen <rseelaen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/27 17:56:24 by rseelaen          #+#    #+#             */
-/*   Updated: 2023/05/12 16:25:12 by rseelaen         ###   ########.fr       */
+/*   Updated: 2024/02/01 13:41:47 by rseelaen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 void	ft_putstr_fd(char *s, int fd)
 {
+	if (!s || fd == -1)
+		return ;
 	while (*s)
 		write(fd, s++, 1);
 }

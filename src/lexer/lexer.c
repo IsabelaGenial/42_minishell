@@ -6,7 +6,7 @@
 /*   By: rseelaen <rseelaen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/07 18:27:46 by renato            #+#    #+#             */
-/*   Updated: 2023/12/18 14:36:02 by rseelaen         ###   ########.fr       */
+/*   Updated: 2024/02/09 13:57:55 by rseelaen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,12 @@ int	get_type(char *str)
 		return (OUTFILE);
 	else if (!ft_strcmp(str, "<"))
 		return (INFILE);
-	else if (!ft_strcmp(str, "&&"))
-		return (AND);
-	else if (!ft_strcmp(str, "||"))
-		return (OR);
 	else if (!ft_strcmp(str, "|"))
 		return (PIPE);
 	return (WORD);
 }
 
-char	*remove_quotes(char *str)
+static char	*remove_quotes(char *str)
 {
 	int		i;
 	int		j;
@@ -56,36 +52,70 @@ char	*remove_quotes(char *str)
 	return (tmp);
 }
 
-int	lexer(char **str)
+static int	check_syntax(void)
 {
-	char	*token;
-	int		expand;
+	t_token	*tmp;
 
-	token = tokenizer(*str);
-	expand = 1;
-	while (token)
+	tmp = g_main.token_list;
+	while (tmp)
 	{
-		add_token(token, get_type(token));
-		ft_safe_free((void **)&token);
-		token = tokenizer(NULL);
-		expand = 1;
+		if (tmp->type == APPEND || tmp->type == HEREDOC
+			|| tmp->type == OUTFILE || tmp->type == INFILE)
+		{
+			if (!tmp->next || tmp->next->type != WORD)
+				return (syntax_error(tmp->name));
+		}
+		if (tmp->type == PIPE && (tmp->prev == NULL || tmp->next == NULL
+				|| (tmp->next && tmp->next->type == PIPE)))
+			return (syntax_error(tmp->name));
+		tmp = tmp->next;
 	}
-	if (g_main.open_quote)
-	{
-		ft_putstr_fd("Error: unclosed quotes\n", 2);
-        g_main.open_quote = 0;
-		clear_token_list();
+	return (0);
+}
 
-		return (1);
-	}
-	t_token	*tmp = g_main.token_list;
+static int	check_and_clear(void)
+{
+	t_token	*tmp;
+
+	tmp = g_main.token_list;
 	while (tmp)
 	{
 		tmp->name = expand_var(tmp->name);
 		tmp->name = remove_quotes(tmp->name);
 		tmp = tmp->next;
 	}
+	if (g_main.token_list && check_syntax())
+	{
+		g_main.status = 2;
+		return (2);
+	}
+	return (0);
+}
+
+int	lexer(char **str)
+{
+	char	*token;
+
+	token = tokenizer(*str);
+	while (token)
+	{
+		add_token(token, get_type(token));
+		ft_safe_free((void **)&token);
+		token = tokenizer(NULL);
+	}
+	g_main.line = *str;
+	if (g_main.open_quote)
+	{
+		ft_putstr_fd("Error: unclosed quotes\n", 2);
+		g_main.open_quote = FALSE;
+		clear_token_list();
+		g_main.status = 1;
+		return (1);
+	}
+	if (check_and_clear())
+		return (1);
 	create_cmd_list();
+	clear_token_list();
 	ft_safe_free((void **)&token);
 	return (0);
 }

@@ -1,26 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   pwd.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rseelaen <rseelaen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/04/18 12:09:06 by rseelaen          #+#    #+#             */
-/*   Updated: 2024/02/01 13:45:18 by rseelaen         ###   ########.fr       */
+/*   Created: 2024/02/02 01:49:48 by renato            #+#    #+#             */
+/*   Updated: 2024/02/02 17:54:10 by rseelaen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "shell.h"
 
-//Return the length of a string
-size_t	ft_strlen(const char *s)
+int	ft_pwd(int fd)
 {
-	size_t	length;
+	char	*cwd;
 
-	if (!s)
-		return (0);
-	length = 0;
-	while (*s++)
-		length++;
-	return (length);
+	cwd = getcwd(NULL, 0);
+	ft_putendl_fd(cwd, fd);
+	ft_safe_free((void **)&cwd);
+	return (0);
 }

@@ -6,153 +6,34 @@
 /*   By: rseelaen <rseelaen@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 12:32:42 by rseelaen          #+#    #+#             */
-/*   Updated: 2023/12/18 15:46:24 by rseelaen         ###   ########.fr       */
+/*   Updated: 2024/02/09 13:45:52 by rseelaen         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "shell.h"
 
-// static void	redir_error(t_token *token)
-// {
-// 	ft_putstr_fd("minishell: syntax error near unexpected token `", 2);
-// 	ft_putstr_fd(token->content, 2);
-// 	ft_putstr_fd("'\n", 2);
-// 	g_main.status = 1;
-// }
-
-// static void	redir_2(t_token *token, t_cmd *cmd)
-// {
-// 	int			fd;
-
-// 	if (token->type == REDIR)
-// 	{
-// 		if (token->next && token->next->type == WORD)
-// 		{
-// 			fd = open(token->next->content, O_WRONLY | O_CREAT | O_APPEND, 0644);
-// 			if (fd == -1)
-// 			{
-// 				ft_putstr_fd("minishell: ", 2);
-// 				ft_putstr_fd(token->next->content, 2);
-// 				ft_putstr_fd(": ", 2);
-// 				ft_putstr_fd(strerror(errno), 2);
-// 				ft_putstr_fd("\n", 2);
-// 				g_main.status = 1;
-// 				return ;
-// 			}
-// 			dup2(fd, STDOUT_FILENO);
-// 			close(fd);
-// 			redir_2(token->next->next, cmd);
-// 		}
-// 	}
-// }
-
-// static void	redir_1(t_token *token, t_cmd *cmd)
-// {
-// 	int			fd;
-
-// 	if (token->type == REDIR)
-// 	{
-// 		if (token->next && token->next->type == WORD)
-// 		{
-// 			fd = open(token->next->content, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-// 			if (fd == -1)
-// 			{
-// 				ft_putstr_fd("minishell: ", 2);
-// 				ft_putstr_fd(token->next->content, 2);
-// 				ft_putstr_fd(": ", 2);
-// 				ft_putstr_fd(strerror(errno), 2);
-// 				ft_putstr_fd("\n", 2);
-// 				g_main.status = 1;
-// 				return ;
-// 			}
-// 			dup2(fd, STDOUT_FILENO);
-// 			close(fd);
-// 			redir_1(token->next->next, cmd);
-// 		}
-// 	}
-// }
-
-// static void	redir(t_cmd *cmd)
-// {
-// 	t_token		*token;
-
-// 	token = cmd->token;
-// 	while (token)
-// 	{
-// 		if (token->type == REDIR)
-// 		{
-// 			if (token->next && token->next->type == WORD)
-// 			{
-// 				if (token->next->next && token->next->next->type == WORD)
-// 					redir_2(token, cmd);
-// 				else
-// 					redir_1(token, cmd);
-// 			}
-// 			else
-// 				redir_error(token->next);
-// 		}
-// 		token = token->next;
-// 	}
-// }
-
-// static void	pipe_exec(t_cmd *cmd)
-// {
-// 	int			pipefd[2];
-// 	pid_t		pid;
-//
-// 	if (pipe(pipefd) == -1)
-// 	{
-// 		ft_putstr_fd("pipe error\n", 2);
-// 		return ;
-// 	}
-// 	pid = fork();
-// 	if (pid == -1)
-// 	{
-// 		ft_putstr_fd("fork error\n", 2);
-// 		return ;
-// 	}
-// 	if (pid == 0)
-// 	{
-// 		close(pipefd[0]);
-// 		dup2(pipefd[1], STDOUT_FILENO);
-// 		close(pipefd[1]);
-// 		redir(cmd);
-// 		execve(cmd->path, cmd->args, g_main.env_var->env);
-// 		ft_putstr_fd("execve error\n", 2);
-// 		exit(1);
-// 	}
-// 	else
-// 	{
-// 		close(pipefd[1]);
-// 		dup2(pipefd[0], STDIN_FILENO);
-// 		close(pipefd[0]);
-// 	}
-// }
-
-char	*check_path(char *name)
+void	set_fd(t_cmd *cmd)
 {
-	char		*path;
-	char		**paths;
-	int			i;
-
-	i = -1;
-	path = search_value(g_main.env_var, "PATH");
-	if (!path)
-		return (NULL);
-	paths = ft_split(path, ':');
-	while (paths[++i])
+	if (cmd->infile != NULL)
 	{
-		path = ft_strjoin(paths[i], "/");
-		path = ft_strjoin_free(path, name);
-		if (!access(path, F_OK))
+		cmd->fd[0] = open(cmd->infile, O_RDONLY);
+		if (cmd->fd[0] == -1)
 		{
-			free_tab(paths);
-			return (path);
+			ft_error(cmd->infile, NULL, 1);
+			exit(1);
 		}
-		ft_safe_free((void **)&path);
+		dup2(cmd->fd[0], STDIN_FILENO);
+		close(cmd->fd[0]);
 	}
-	free_tab(paths);
-	return (NULL);
+	if (cmd->outfile != NULL)
+	{
+		if (cmd->redir[1] == APPEND)
+			cmd->fd[1] = open(cmd->outfile, O_WRONLY | O_APPEND, 0644);
+		else if (cmd->redir[1] == OUTFILE)
+			cmd->fd[1] = open(cmd->outfile, O_WRONLY | O_TRUNC, 0644);
+		dup2(cmd->fd[1], STDOUT_FILENO);
+		close(cmd->fd[1]);
+	}
 }
 
 void	exec(t_cmd *cmd, char *path)
@@ -160,6 +41,7 @@ void	exec(t_cmd *cmd, char *path)
 	int		pid;
 
 	pid = fork();
+	signal(SIGQUIT, sigquit);
 	if (pid == -1)
 	{
 		ft_putstr_fd("fork error\n", 2);
@@ -167,23 +49,66 @@ void	exec(t_cmd *cmd, char *path)
 	}
 	if (pid == 0)
 	{
-		// redir(cmd);
-		if (execve(path, cmd->args, NULL) == -1)
+		set_fd(cmd);
+		if (execve(path, cmd->args, g_main.envp) == -1)
 			ft_putstr_fd("execve error\n", 2);
 		exit(1);
 	}
 	else
+	{
 		waitpid(pid, &g_main.status, 0);
+		if (g_main.signal_received)
+			g_main.status = 130;
+		signal(SIGQUIT, SIG_IGN);
+	}
 }
 
-int	check_if_builtin(char *name)
+void	simple_command(t_cmd *cmd)
 {
-	if (ft_strcmp(name, "echo") == 0 || ft_strcmp(name, "cd") == 0
-		|| ft_strcmp(name, "pwd") == 0 || ft_strcmp(name, "export") == 0
-		|| ft_strcmp(name, "unset") == 0 || ft_strcmp(name, "env") == 0
-		|| ft_strcmp(name, "exit") == 0)
+	char	*path;
+
+	g_main.is_cmd_running = TRUE;
+	if (file_dir_check(cmd))
+	{
+		g_main.is_cmd_running = FALSE;
+		return ;
+	}
+	path = check_path(cmd->name);
+	if (check_if_builtin(cmd->name))
+	{
+		ft_safe_free((void **)&path);
+		exec_builtin(cmd);
+	}
+	else if (path && !access(path, F_OK))
+		exec(cmd, path);
+	else
+		ft_error(cmd->name, "command not found", 127);
+	ft_safe_free((void **)&path);
+	g_main.is_cmd_running = FALSE;
+}
+
+void	execute_cmd_list(void)
+{
+	t_cmd	*cmd;
+
+	cmd = g_main.cmd_list;
+	if (cmd && ig_is_redir(cmd->name) && !cmd->prev && !cmd->next)
+	{
+		clear_cmd_list();
+		return ;
+	}
+	if (cmd && g_main.pipe->pipe_counter == 0)
+		simple_command(cmd);
+	if (cmd && g_main.pipe->pipe_counter != 0)
+		ig_pipe(cmd);
+	heredoc_files(REMOVE);
+	clear_cmd_list();
+}
+
+int	ig_is_redir(char *name)
+{
+	if (ft_strcmp(name, "<<") == 0 || ft_strcmp(name, ">>") == 0
+		|| ft_strcmp(name, "<") == 0 || ft_strcmp(name, ">") == 0)
 		return (1);
 	return (0);
 }
-
-
